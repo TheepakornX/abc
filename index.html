@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ABC</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container-fluid p-0">
+        <video id="videoA" preload="auto" muted></video>
+        <video id="videoB" preload="auto" muted style="opacity: 0;"></video>
+        <div class="button-group d-none flex-column align-items-center" id="answer">
+        </div>
+        <div class="abc flex-column align-items-center" id="textfromfam">
+            <p class="momtext btbg2 rounded"></p>
+            <p class="myselftext btbg2 rounded"></p>
+            <p class="dadtext btbg2 rounded"></p>
+        </div>
+    </div>
+
+    <script>
+        const videoList = Array.from({ length: 51 }, (_, i) => `assets/background/${i + 1}.mp4`);
+        let currentVideoIndex = 0;
+        let currentVideo = document.getElementById('videoA');
+        let nextVideo = document.getElementById('videoB');
+        let isWaitingForAnswer = false;
+
+        const buttonGroup = document.querySelector('.button-group');
+        const endtext = document.querySelector('.abc');
+
+        endtext.classList.add('d-none')
+
+
+        function playNextVideo() {
+            if (isWaitingForAnswer) {
+                return;
+            }
+
+            currentVideoIndex++; 
+            if ([15 , 19 , 21 ,22 , 24 , 26 , 28 ,30 , 32 , 34 , 36 , 38 , 40 , 42 , 44 , 46 , 47 , 48].includes(currentVideoIndex)) {
+                displayanswer();
+                buttonGroup.classList.remove('d-none');
+                buttonGroup.classList.add('d-flex');
+                isWaitingForAnswer = true; 
+            } else {
+                buttonGroup.classList.remove('d-flex');
+                buttonGroup.classList.add('d-none');
+            }
+            if (currentVideoIndex === 49){
+                endtext.classList.remove('d-none')
+            } else if (currentVideoIndex === 50){
+                endtext.classList.add('d-none')
+            }else{}
+
+            if (currentVideoIndex < videoList.length) {
+                switchVideos(); 
+            } else {
+            }
+        }
+
+        function switchVideos() {
+            nextVideo.src = videoList[currentVideoIndex];
+            nextVideo.load();
+
+            nextVideo.addEventListener('canplay', () => {
+                currentVideo.style.opacity = 0;
+                nextVideo.style.opacity = 1;
+                nextVideo.play();
+
+                [currentVideo, nextVideo] = [nextVideo, currentVideo];
+
+                currentVideo.addEventListener('ended', () => {
+                    if (!isWaitingForAnswer) {
+                        playNextVideo();
+                    } else {
+                        currentVideo.pause();
+                    }
+                }, { once: true });
+            }, { once: true });
+        }
+
+        currentVideo.src = videoList[currentVideoIndex];
+        currentVideo.play();
+        currentVideo.addEventListener('ended', () => {
+            if (!isWaitingForAnswer) {
+                playNextVideo();
+            }
+        }, { once: true });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
+        </script>
+    <script src="ans.js"></script>
+</body>
+
+</html>
